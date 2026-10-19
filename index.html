@@ -193,7 +193,6 @@ input.bad{border-color:#b33}
     <div><label>الاسم الكامل بالعربية <span class="req">*</span></label><input id="nameAr" required placeholder="كما تريده في الشهادة"><div class="err"></div></div>
     <div><label>الاسم الكامل بالإنجليزية <span class="req">*</span></label><input id="nameEn" required dir="ltr" placeholder="Full name as on the certificate"><div class="err"></div></div>
     <div><label>رقم الجوال <span class="req">*</span></label><input id="mobile" required dir="ltr" placeholder="05XXXXXXXX"><div class="err"></div></div>
-    <div><label>رقم التصنيف المهني (الهيئة السعودية للتخصصات الصحية)</label><input id="scfhs" dir="ltr"><div class="err"></div></div>
     <div><label>جهة العمل / القسم <span class="req">*</span></label><input id="dept" required><div class="err"></div></div>
     <div><label>الفئة <span class="req">*</span></label>
       <select id="role" required><option value="">اختر…</option><option>طبيب</option><option>تمريض</option><option>صيدلي</option><option>فني / أخصائي صحي</option><option>إداري</option><option>متدرب / طالب</option><option>أخرى</option></select><div class="err"></div></div>
@@ -270,7 +269,7 @@ input.bad{border-color:#b33}
     <select id="fs"><option value="">كل الحالات</option><option value="p">حاصل على الشهادة</option><option value="q">في التقييم</option><option value="c">قيد الدورة</option></select>
     <button class="btn" id="csvBtn" type="button">تصدير Excel (CSV)</button>
   </div>
-  <div class="tblwrap"><table class="tbl"><thead><tr><th>#</th><th>الاسم</th><th>الجوال / التصنيف</th><th>الجهة</th><th>الفئة</th><th>تاريخ التسجيل</th><th>التقدم</th><th>المحاولات</th><th>الدرجة</th><th>الحالة</th><th>رقم الشهادة</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+  <div class="tblwrap"><table class="tbl"><thead><tr><th>#</th><th>الاسم</th><th>الجوال</th><th>الجهة</th><th>الفئة</th><th>تاريخ التسجيل</th><th>التقدم</th><th>المحاولات</th><th>الدرجة</th><th>الحالة</th><th>رقم الشهادة</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
   <p class="small" id="tcount"></p>
   </div>
 </section>
@@ -580,7 +579,7 @@ function show(v){
   if(v!=='admin'){S.view=v;save()}window.scrollTo(0,0);
 }
 // registration
-const F=['nameAr','nameEn','mobile','scfhs','dept','role'];
+const F=['nameAr','nameEn','mobile','dept','role'];
 function validate(){
   let ok=true;
   const set=(id,msg)=>{const el=$('#'+id),er=el.closest('div').querySelector('.err');el.classList.toggle('bad',!!msg);if(er)er.textContent=msg||'';if(msg)ok=false};
@@ -663,10 +662,10 @@ function renderAdmin(){
   const role={},dept={};R.forEach(r=>{role[r.p.role||'—']=(role[r.p.role||'—']||0)+1;dept[r.p.dept||'—']=(dept[r.p.dept||'—']||0)+1});
   bars($('#byRole'),role);bars($('#byDept'),dept,8);
   const q=$('#fq').value.trim().toLowerCase(),fs=$('#fs').value;
-  const L=R.filter(r=>(!fs||stat(r)===fs)&&(!q||[r.p.nameAr,r.p.nameEn,r.p.mobile,r.p.scfhs,r.p.dept].join(' ').toLowerCase().includes(q)))
+  const L=R.filter(r=>(!fs||stat(r)===fs)&&(!q||[r.p.nameAr,r.p.nameEn,r.p.mobile,r.p.dept].join(' ').toLowerCase().includes(q)))
     .sort((a,b)=>String(b.regAt).localeCompare(String(a.regAt)));
   $('#tb').innerHTML=L.map((r,i)=>{const st=stat(r);return `<tr><td>${i+1}</td><td><b>${esc(r.p.nameAr)}</b><br><span class="small" dir="ltr">${esc(r.p.nameEn)}</span></td>
-    <td dir="ltr" style="text-align:right">${esc(r.p.mobile)}<br><span class="small">${esc(r.p.scfhs||'—')}</span></td><td>${esc(r.p.dept)}</td><td>${esc(r.p.role)}</td><td>${fmtD(r.regAt)}</td>
+    <td dir="ltr" style="text-align:right">${esc(r.p.mobile)}</td><td>${esc(r.p.dept)}</td><td>${esc(r.p.role)}</td><td>${fmtD(r.regAt)}</td>
     <td>${r.done}/${r.total}</td><td>${r.attempts||0}</td><td>${r.score!=null?r.score+'٪':(r.lastScore!=null?'<span class="small">آخر محاولة '+r.lastScore+'٪</span>':'—')}</td>
     <td><span class="tag ${st}">${STL[st]}</span></td><td dir="ltr" class="small">${esc(r.cid||'—')}</td>
     <td>${r.passedAt?`<button class="linkbtn" data-k="${esc(r._id)}">طباعة الشهادة</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="12" class="small" style="text-align:center;padding:20px">لا يوجد متدربون مطابقون.</td></tr>';
@@ -698,9 +697,9 @@ $('#helpModal').onclick=e=>{if(e.target.id==='helpModal')$('#helpModal').classLi
 $('#adminBack').onclick=()=>{adminOn=false;if(S.p&&S.passedAt){renderCert();show('cert')}else if(S.p){renderCourse();show('course')}else show('reg')};
 $('#fq').oninput=renderAdmin;$('#fs').onchange=renderAdmin;
 $('#csvBtn').onclick=async()=>{
-  const H=['الاسم بالعربية','Name (EN)','الجوال','رقم التصنيف المهني','الجهة','الفئة','تاريخ التسجيل','الدروس المكتملة','المحاولات','الدرجة','تاريخ الإتمام','رقم الشهادة','الحالة'];
+  const H=['الاسم بالعربية','Name (EN)','الجوال','الجهة','الفئة','تاريخ التسجيل','الدروس المكتملة','المحاولات','الدرجة','تاريخ الإتمام','رقم الشهادة','الحالة'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const lines=[H.map(q).join(',')].concat(ROWS.filter(r=>r.p).map(r=>[r.p.nameAr,r.p.nameEn,r.p.mobile,r.p.scfhs,r.p.dept,r.p.role,fmtD(r.regAt),r.done+'/'+r.total,r.attempts||0,r.score??'',fmtD(r.passedAt),r.cid||'',STL[stat(r)]].map(q).join(',')));
+  const lines=[H.map(q).join(',')].concat(ROWS.filter(r=>r.p).map(r=>[r.p.nameAr,r.p.nameEn,r.p.mobile,r.p.dept,r.p.role,fmtD(r.regAt),r.done+'/'+r.total,r.attempts||0,r.score??'',fmtD(r.passedAt),r.cid||'',STL[stat(r)]].map(q).join(',')));
   const data='\ufeff'+lines.join('\r\n'),fn='متدربو_تثقيف_الباحث_'+new Date().toISOString().slice(0,10)+'.csv';
   const dl=await claude.use('downloads');
   if(dl){try{await dl.save({filename:fn,data})}catch(e){if(e&&e.code!=='declined')alert('تعذر حفظ الملف.')}}
