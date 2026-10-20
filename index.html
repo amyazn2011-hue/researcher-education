@@ -2881,7 +2881,7 @@ function show(v){
   if(v!=='admin'&&v!=='verify'){S.view=v;save()}window.scrollTo(0,0);
 }
 // ---------- central record (Google Sheets) ----------
-const BACKEND=''; // رابط تطبيق الويب من Google Apps Script
+const BACKEND='https://script.google.com/macros/s/AKfycbzVpPXNKZGRsll0hkbIkQg89J1-RLLL7xslbvmL5PtgSVI1exLub4_doxAC9YPYUEo5/exec'; // رابط تطبيق الويب من Google Apps Script
 const SITE_URL='https://research-jam.github.io/researcher-education/';
 function newTid(){try{return crypto.randomUUID()}catch(e){return 'T'+Date.now().toString(36)+Math.random().toString(36).slice(2,10)}}
 async function api(action,extra){
